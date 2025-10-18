@@ -1,0 +1,56 @@
+Items: {
+	AnglerMedal: {
+		// DisplayName: Angler Medal
+		// Tooltip: Earned from completing Angler quests. Exchanged for quest rewards.
+	}
+
+	SurfaceEssence: {
+		// DisplayName: Surface Essence
+		// Tooltip: The essence of an item that can appear in chests on the surface.
+	}
+
+	CavernEssence: {
+		// DisplayName: Cavern Essence
+		// Tooltip: ""
+	}
+
+	DungeonEssence: {
+		// DisplayName: Dungeon Essence
+		// Tooltip: ""
+	}
+
+	IceEssence: {
+		// DisplayName: Ice Essence
+		// Tooltip: ""
+	}
+
+	JungleEssence: {
+		// DisplayName: Jungle Essence
+		// Tooltip: ""
+	}
+
+	SandEssence: {
+		// DisplayName: Sand Essence
+		// Tooltip: ""
+	}
+
+	ShadowEssence: {
+		// DisplayName: Shadow Essence
+		// Tooltip: ""
+	}
+
+	SkyEssence: {
+		// DisplayName: Sky Essence
+		// Tooltip: ""
+	}
+
+	UndergroundEssence: {
+		// DisplayName: Underground Essence
+		// Tooltip: ""
+	}
+
+	WaterEssence: {
+		// DisplayName: Water Essence
+		// Tooltip: ""
+	}
+}
