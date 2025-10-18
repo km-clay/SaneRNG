@@ -19,10 +19,12 @@ namespace SaneRNG.Content.Items
 		}
 
 		public override void AddRecipes() {
-			CreateRecipe(1)
-				.AddIngredient(ItemID.DirtBlock, 1)
-				.AddTile(TileID.WorkBenches)
-				.Register();
+			if (SaneRNG.DEBUG) {
+				CreateRecipe(1)
+					.AddIngredient(ItemID.DirtBlock, 1)
+					.AddTile(TileID.WorkBenches)
+					.Register();
+			}
 		}
 	}
 }

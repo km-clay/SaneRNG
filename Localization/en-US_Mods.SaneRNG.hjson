@@ -11,46 +11,78 @@ Items: {
 
 	CavernEssence: {
 		DisplayName: Cavern Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the cavern layer.
 	}
 
 	DungeonEssence: {
 		DisplayName: Dungeon Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the dungeon.
 	}
 
 	IceEssence: {
 		DisplayName: Ice Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the ice biome.
 	}
 
 	JungleEssence: {
 		DisplayName: Jungle Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the jungle biome.
 	}
 
 	SandEssence: {
 		DisplayName: Sand Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the desert biome.
 	}
 
 	ShadowEssence: {
 		DisplayName: Shadow Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the corruption/crimson biome.
 	}
 
 	SkyEssence: {
 		DisplayName: Sky Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the sky biome.
 	}
 
 	UndergroundEssence: {
 		DisplayName: Underground Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in chests in the underground layer.
 	}
 
 	WaterEssence: {
 		DisplayName: Water Essence
+		Tooltip: The essence of an item that can appear in chests underwater.
+	}
+
+	RequestVoucher: {
+		DisplayName: Request Voucher
+		Tooltip: Used to request items from the Traveling Merchant.
+	}
+
+	CommonRequest: {
+		DisplayName: Common Request
+		Tooltip: ""
+	}
+
+	ExtremelyRareRequest: {
+		DisplayName: Extremely Rare Request
+		Tooltip: ""
+	}
+
+	RareRequest: {
+		DisplayName: Rare Request
+		Tooltip: ""
+	}
+
+	UncommonRequest: {
+		DisplayName: Uncommon Request
+		Tooltip: ""
+	}
+
+	VeryRareRequest: {
+		DisplayName: Very Rare Request
 		Tooltip: ""
 	}
 }
+
+NPCs.CarrierBird.DisplayName: Carrier Bird

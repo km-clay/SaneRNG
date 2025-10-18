@@ -3,7 +3,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.DataStructures;
 using Microsoft.Xna.Framework;
-using SaneRNG.Content.Items;
 
 namespace SaneRNG.Common.Items {
 	public abstract class EssenceItem : ModItem {
@@ -17,11 +16,12 @@ namespace SaneRNG.Common.Items {
 					.AddTile(TileID.DemonAltar)
 					.Register();
 			}
+			if (SaneRNG.DEBUG) {
+				CreateRecipe(1)
+					.AddIngredient(ItemID.DirtBlock, 1)
+					.Register();
 
-			// Debug recipe, allows for crafting each essence using 1 dirt block
-			// CreateRecipe(1)
-				// .AddIngredient(ItemID.DirtBlock, 1)
-				// .Register();
+			}
 		}
 
 		public override void SetStaticDefaults() {
