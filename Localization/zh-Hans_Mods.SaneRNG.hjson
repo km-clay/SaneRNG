@@ -58,31 +58,9 @@ Items: {
 		// DisplayName: Request Voucher
 		// Tooltip: Used to request items from the Traveling Merchant.
 	}
-
-	CommonRequest: {
-		// DisplayName: Common Request
-		// Tooltip: ""
-	}
-
-	ExtremelyRareRequest: {
-		// DisplayName: Extremely Rare Request
-		// Tooltip: ""
-	}
-
-	RareRequest: {
-		// DisplayName: Rare Request
-		// Tooltip: ""
-	}
-
-	UncommonRequest: {
-		// DisplayName: Uncommon Request
-		// Tooltip: ""
-	}
-
-	VeryRareRequest: {
-		// DisplayName: Very Rare Request
-		// Tooltip: ""
-	}
 }
 
-// NPCs.CarrierBird.DisplayName: Carrier Bird
+Currencies: {
+	// RequestVoucherCurrency: request vouchers
+	// AnglerMedalCurrency: angler medals
+}
