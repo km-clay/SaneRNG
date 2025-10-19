@@ -14,7 +14,7 @@ namespace SaneRNG.Common.NPCs {
 	public class SaneRNGGlobalNPC : GlobalNPC {
 		public override void SetDefaults(NPC entity) {
 			if (SaneRNG.DEBUG && entity.type == NPCID.TravellingMerchant) {
-				entity.friendly = false;
+				entity.friendly = true;
 			}
 		}
 

@@ -61,6 +61,6 @@ Items: {
 }
 
 Currencies: {
-	// RequestVoucherCurrency: request vouchers
-	// AnglerMedalCurrency: angler medals
+	// RequestVoucherCurrency: request voucher
+	// AnglerMedalCurrency: angler medal
 }

@@ -30,7 +30,7 @@ namespace SaneRNG.Common.NPCs {
 			On_Player.GetAnglerReward -= ReplaceAnglerReward;
 		}
 
-		private static void ReplaceAnglerReward(On_Player.orig_GetAnglerReward orig, Player self, NPC angler, int questItemType) {
+		private static void ReplaceAnglerReward(On_Player.orig_GetAnglerReward orig, Terraria.Player self, NPC angler, int questItemType) {
 			// Don't call orig() - we're replacing vanilla rewards entirely
 
 			int type = ModContent.ItemType<AnglerMedal>();

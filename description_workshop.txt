@@ -1,1 +1,15 @@
-This description will show up on the steam page, check out https://steamcommunity.com/comment/Guide/formattinghelp.
+An opinionated overhaul for various pure RNG systems that have absolutely no reason to be pure RNG.
+
+[h1]Features[/h1]
+
+[h2]Angler Shops[/h2]
+[p]The Angler's quest system has been completely overhauled. The Angler now has two shops (one for functional items, one for decorations), which use Angler Medals as currency. Angler quests now only reward Angler Medals.[/p]
+
+[h2]Traveling Merchant Item Requests[/h2]
+[p]The Traveling Merchant now has a new dialogue option. Using Request Vouchers, you can choose items to request for his next visit. Requested items are [i]guaranteed[/i] to appear in his next inventory. The Traveling Merchant brings one free Request Voucher with him on each visit.[/p]
+
+[h2]Chest Essence[/h2]
+[p]All chests that spawn naturally in the world now contain one additional new item: an Essence of the location where that chest was found. Four Essences can be combined at a demon altar to [i]craft any item[/i] from that chest's loot table. For instance, after opening four Frozen Chests, you can use Ice Essence to craft a pair of Ice Skates. All loot chests in the world have a corresponding Essence item, including dungeon chests and floating island chests.[/p]
+
+[h2]Item Drop Pity System[/h2]
+[p]All items are guaranteed to drop after their expected number of kills. This means that if an item has a 1/100 drop rate from a specific enemy, it is [i]guaranteed[/i] to drop on the 100th kill. This works per item and not per enemy, so if several enemies drop a specific item rarely (biome keys, slime staff, etc.), killing any of them will count toward a guaranteed drop.[/p]
