@@ -70,6 +70,8 @@ namespace SaneRNG.Common.NPCs {
 			var drops = GetNPCDrops(npc.type);
 
 			foreach (var (itemID, dropRate) in drops) {
+				if (dropRate == 1f) continue; // Skip guaranteed drops
+
 				float percentage = dropRate * 100f;
 				player.AddProgress(itemID,percentage);
 			}
