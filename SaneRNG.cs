@@ -13,6 +13,6 @@ namespace SaneRNG
 		// Enables debug behaviors
 		// Cheap crafting recipes for essences, constant traveling merchant spawns, etc.
 		// Disable this for release builds
-		public const bool DEBUG = true;
+		public const bool DEBUG = false;
 	}
 }

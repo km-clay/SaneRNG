@@ -13,6 +13,7 @@ namespace SaneRNG.Common.World {
 		public static readonly (int TileType, int FrameX) Granite = (TileID.Containers, 50 * 36);
 		public static readonly (int TileType, int FrameX) Marble = (TileID.Containers, 51 * 36);
 		public static readonly (int TileType, int FrameX) Mushroom = (TileID.Containers, 32 * 36);
+		public static readonly (int TileType, int FrameX) GoldTrap = (TileID.Containers2, 4 * 36);
 
 		// Dungeon items
 		public static readonly (int TileType, int FrameX) Dungeon = (TileID.Containers, 2 * 36);
@@ -54,6 +55,7 @@ namespace SaneRNG.Common.World {
 					var t when t == ChestStyles.Frozen => ModContent.ItemType<IceEssence>(),
 
 					var t when t == ChestStyles.Gold => ModContent.ItemType<UndergroundEssence>(),
+					var t when t == ChestStyles.GoldTrap => ModContent.ItemType<UndergroundEssence>(),
 					var t when t == ChestStyles.Granite => ModContent.ItemType<UndergroundEssence>(),
 					var t when t == ChestStyles.Marble => ModContent.ItemType<UndergroundEssence>(),
 					var t when t == ChestStyles.Mushroom => ModContent.ItemType<UndergroundEssence>(),
