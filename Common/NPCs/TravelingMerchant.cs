@@ -117,6 +117,21 @@ namespace SaneRNG.Common.NPCs {
 
 		}
 
+		public override void SaveWorldData(Terraria.ModLoader.IO.TagCompound tag) {
+			if (requestedItems.Count > 0) {
+				tag["requestedItems"] = requestedItems.ToList();
+			}
+		}
+
+		public override void LoadWorldData(Terraria.ModLoader.IO.TagCompound tag) {
+			var requests = tag.GetList<int>("requestedItems");
+			requestedItems = new Queue<int>(requests);
+		}
+
+		public override void ClearWorld() {
+			requestedItems.Clear();
+		}
+
 		public static void PopulateRequestsPage1(Item[] items, NPC npc) {
 			int slot = 0;
 

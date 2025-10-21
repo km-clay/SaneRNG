@@ -1,4 +1,5 @@
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.GameContent.ItemDropRules;
 using System.Collections.Generic;
@@ -64,13 +65,37 @@ namespace SaneRNG.Common.Player {
 
 namespace SaneRNG.Common.NPCs {
 	public class PityDropsGlobalNPC : GlobalNPC {
+
+		private bool isEoWSegment(NPC npc) {
+			return (npc.type == NPCID.EaterofWorldsHead
+				|| npc.type == NPCID.EaterofWorldsBody
+				|| npc.type == NPCID.EaterofWorldsTail);
+		}
+
 		public override void OnKill(NPC npc) {
 			Terraria.Player killer = Main.player[npc.lastInteraction];
 			var player = killer.GetModPlayer<PityDropsPlayer>();
 			var drops = GetNPCDrops(npc.type);
 
 			foreach (var (itemID, dropRate) in drops) {
-				if (dropRate == 1f) continue; // Skip guaranteed drops
+				if (dropRate == 1f || dropRate == 0f) continue; // Skip guaranteed or impossible drops
+
+
+				if (isEoWSegment(npc)) {
+					bool eowStillAlive = false;
+					for (int i = 0; i < Main.maxNPCs; i++) {
+						NPC other = Main.npc[i];
+						if (other.active && isEoWSegment(other) && other.whoAmI != npc.whoAmI) {
+							eowStillAlive = true;
+							break;
+						}
+					}
+
+					if (eowStillAlive) {
+						// Fight is still going, ignore this kill
+						return;
+					}
+				}
 
 				float percentage = dropRate * 100f;
 				player.AddProgress(itemID,percentage);
@@ -88,7 +113,27 @@ namespace SaneRNG.Common.NPCs {
 				DropRateInfoChainFeed chainInfo = new DropRateInfoChainFeed(1f);
 				rule.ReportDroprates(dropInfos,chainInfo);
 				foreach (var info in dropInfos) {
-					result.Add((info.itemId, info.dropRate));
+
+					// We can't just naively add the itemid and droprate here
+					// We have to actually check to make sure that it's possible
+					// for the item to drop in the first place.
+					bool canDrop = true;
+					if (info.conditions != null) {
+						foreach (var condition in info.conditions) {
+							DropAttemptInfo attemptInfo = new DropAttemptInfo {
+								IsExpertMode = Main.expertMode,
+								IsMasterMode = Main.masterMode
+							};
+							if (!condition.CanDrop(attemptInfo)) {
+								canDrop = false;
+								break;
+							}
+						}
+					}
+
+					if (canDrop) {
+						result.Add((info.itemId, info.dropRate) );
+					}
 				}
 			}
 
