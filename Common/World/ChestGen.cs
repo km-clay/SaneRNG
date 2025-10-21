@@ -2,10 +2,14 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using SaneRNG.Content.Items;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SaneRNG.Common.World {
 	public static class ChestStyles {
 		// Surface Items, sometimes appear in the dungeon though.
+		// Wood chests in the dungeon always have a golden key.
 		public static readonly (int TileType, int FrameX) Wood = (TileID.Containers, 0 * 36);
 
 		// All Cavern/Underground items, no substantial differences for the purposes of this mod
@@ -14,6 +18,9 @@ namespace SaneRNG.Common.World {
 		public static readonly (int TileType, int FrameX) Marble = (TileID.Containers, 51 * 36);
 		public static readonly (int TileType, int FrameX) Mushroom = (TileID.Containers, 32 * 36);
 		public static readonly (int TileType, int FrameX) GoldTrap = (TileID.Containers2, 4 * 36);
+
+		// Living Wood Chests
+		public static readonly (int TileType, int FrameX) LivingWood = (TileID.Containers, 12 * 36);
 
 		// Dungeon items
 		public static readonly (int TileType, int FrameX) Dungeon = (TileID.Containers, 2 * 36);
@@ -39,6 +46,64 @@ namespace SaneRNG.Common.World {
 	}
 
 	public class ChestGen : ModSystem {
+		private int[] DungeonTiles = [
+			TileID.BlueDungeonBrick,
+			TileID.CrackedBlueDungeonBrick,
+			TileID.GreenDungeonBrick,
+			TileID.CrackedGreenDungeonBrick,
+			TileID.PinkDungeonBrick,
+			TileID.CrackedPinkDungeonBrick
+		];
+		private int[] JungleTiles = [
+			TileID.JungleGrass,
+			TileID.JunglePlants,
+			TileID.JungleVines,
+			TileID.JunglePlants2,
+			TileID.JungleThorns,
+			TileID.Hive,
+			TileID.LihzahrdBrick,
+			TileID.BeeHive,
+			TileID.LivingMahogany,
+			TileID.LivingMahoganyLeaves,
+		];
+
+		private bool IsInBiome(int[] tileSet, int x, int y) {
+			int topLeftX = x - 25;
+			int topLeftY = y - 25;
+			int bottomRightX = x + 25;
+			int bottomRightY = y + 25;
+
+			int biomeTiles = 0;
+
+			for (int i = topLeftX; i < bottomRightX; i++) {
+				for (int j = topLeftY; j < bottomRightY; j++) {
+					if (!WorldGen.InWorld(i,j)) continue;
+
+					Tile tile = Main.tile[i,j];
+
+					if (tile.HasTile && tileSet.Contains(tile.TileType)) {
+						biomeTiles++;
+					}
+				}
+			}
+
+			return biomeTiles > 140;
+		}
+
+		private int GetWoodEssence(Chest chest) {
+			bool hasKey = chest.item[0].type == ItemID.GoldenKey;
+
+			if (hasKey) {
+				return ModContent.ItemType<DungeonEssence>();
+			} else if (chest.y < Main.worldSurface) {
+				return ModContent.ItemType<SurfaceEssence>();
+			} else if (IsInBiome(JungleTiles, chest.x, chest.y)) {
+				return ModContent.ItemType<JungleEssence>();
+			} else {
+				return ModContent.ItemType<UndergroundEssence>();
+			}
+		}
+
 		public override void PostWorldGen() {
 			foreach (Chest chest in Main.chest) {
 				if (chest == null) {
@@ -50,7 +115,9 @@ namespace SaneRNG.Common.World {
 				var chestType = (chestTile.TileType, chestTile.TileFrameX);
 
 				int? essenceType = chestType switch {
-					var t when t == ChestStyles.Wood && chest.y < Main.worldSurface => ModContent.ItemType<SurfaceEssence>(),
+					var t when t == ChestStyles.Wood => GetWoodEssence(chest),
+
+					var t when t == ChestStyles.LivingWood => ModContent.ItemType<LivingWoodEssence>(),
 
 					var t when t == ChestStyles.Frozen => ModContent.ItemType<IceEssence>(),
 
@@ -60,7 +127,6 @@ namespace SaneRNG.Common.World {
 					var t when t == ChestStyles.Marble => ModContent.ItemType<UndergroundEssence>(),
 					var t when t == ChestStyles.Mushroom => ModContent.ItemType<UndergroundEssence>(),
 
-					var t when t == ChestStyles.Wood => ModContent.ItemType<DungeonEssence>(),
 					var t when t == ChestStyles.Dungeon => ModContent.ItemType<DungeonEssence>(),
 
 					var t when t == ChestStyles.Shadow => ModContent.ItemType<ShadowEssence>(),

@@ -25,6 +25,21 @@ namespace SaneRNG.Content.Items {
 		}
 	}
 
+	public class LivingWoodEssence : EssenceItem {
+		protected override Color GetGlowColor() {
+			return Color.ForestGreen;
+		}
+		protected override int[] GetCraftables() {
+			return new int[] {
+				ItemID.LivingWoodWand,
+				ItemID.LeafWand,
+				ItemID.BabyBirdStaff,
+				ItemID.SunflowerMinecart,
+				ItemID.LadybugMinecart,
+			};
+		}
+	}
+
 	public class UndergroundEssence : EssenceItem {
 		protected override Color GetGlowColor() {
 			return Color.Brown;
