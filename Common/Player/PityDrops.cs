@@ -232,7 +232,7 @@ namespace SaneRNG.Common.NPCs {
 
 		private List<(int itemID, float dropRate)> GetNPCDrops(NPC npc, Terraria.Player player) {
 			var result = new List<(int,float)>();
-			var rules = Main.ItemDropsDB.GetRulesForNPCID(npc.type,false);
+			var rules = Main.ItemDropsDB.GetRulesForNPCID(npc.type,true);
 
 			foreach (var rule in rules) {
 				List<DropRateInfo> dropInfos = new();
