@@ -58,9 +58,16 @@ Items: {
 		// DisplayName: Request Voucher
 		// Tooltip: Used to request items from the Traveling Merchant.
 	}
+
+	LivingWoodEssence: {
+		// DisplayName: Living Wood Essence
+		// Tooltip: ""
+	}
 }
 
 Currencies: {
 	// RequestVoucherCurrency: request voucher
 	// AnglerMedalCurrency: angler medal
 }
+
+// "Keybinds.Open Progress Tracker.DisplayName": Open  Progress  Tracker

@@ -12,12 +12,6 @@ using Microsoft.Xna.Framework;
 
 namespace SaneRNG.Common.NPCs {
 	public class SaneRNGGlobalNPC : GlobalNPC {
-		public override void SetDefaults(NPC entity) {
-			if (SaneRNG.DEBUG && entity.type == NPCID.TravellingMerchant) {
-				entity.friendly = true;
-			}
-		}
-
 		public override void OnSpawn(NPC npc, IEntitySource source) {
 			if (npc.type == NPCID.TravellingMerchant) {
 				SaneRNGTravelingMerchant.SetupTravelShopWithRequests();
@@ -110,11 +104,11 @@ namespace SaneRNG.Common.NPCs {
 
 	public class SaneRNGTravelingMerchant : ModSystem {
 		public static Queue<int> requestedItems = new Queue<int>();
-		private static NPCShop requestsShop;
 
 		public override void PostSetupContent() {
-			RequestVoucherCurrency.id = CustomCurrencyManager.RegisterCurrency(new RequestVoucherCurrency(ModContent.ItemType<RequestVoucher>(), 9999)); requestsShop = new NPCShop(NPCID.TravellingMerchant, "Requests");
-
+			RequestVoucherCurrency.id = CustomCurrencyManager.RegisterCurrency(
+				new RequestVoucherCurrency(ModContent.ItemType<RequestVoucher>(), 9999)
+			);
 		}
 
 		public override void SaveWorldData(Terraria.ModLoader.IO.TagCompound tag) {
@@ -132,6 +126,30 @@ namespace SaneRNG.Common.NPCs {
 			requestedItems.Clear();
 		}
 
+		public override void PreUpdateWorld() {
+			if (SaneRNG.DEBUG) {
+				ForceSpawnTravelingMerchant();
+			}
+		}
+		private void ForceSpawnTravelingMerchant() {
+			if (Main.dayTime) {
+				int travelerIdx = NPC.FindFirstNPC(NPCID.TravellingMerchant);
+
+				if (travelerIdx == -1) {
+					int newTraveler = NPC.NewNPC(
+						Terraria.Entity.GetSource_TownSpawn(),
+						Main.spawnTileX * 16,
+						Main.spawnTileY * 16,
+						NPCID.TravellingMerchant
+					);
+					Main.npc[newTraveler].homeless = true;
+					Main.npc[newTraveler].netUpdate = true;
+				}
+			} else {
+				Main.time += 300;
+			};
+		}
+
 		public static void PopulateRequestsPage1(Item[] items, NPC npc) {
 			int slot = 0;
 
@@ -144,9 +162,9 @@ namespace SaneRNG.Common.NPCs {
 			AddRequestToShop(items, ref slot, ItemID.Duality, 1);
 			AddRequestToShop(items, ref slot, ItemID.BennyWarhol, 1);
 			AddRequestToShop(items, ref slot, ItemID.KargohsSummon, 1);
-			AddRequestToShop(items, ref slot, ItemID.Stopwatch, 1);
-			AddRequestToShop(items, ref slot, ItemID.LifeformAnalyzer, 1);
-			AddRequestToShop(items, ref slot, ItemID.DPSMeter, 1);
+			AddRequestToShop(items, ref slot, ItemID.Stopwatch, 2);
+			AddRequestToShop(items, ref slot, ItemID.LifeformAnalyzer, 2);
+			AddRequestToShop(items, ref slot, ItemID.DPSMeter, 2);
 			AddRequestToShop(items, ref slot, ItemID.LawnFlamingo, 1);
 			AddRequestToShop(items, ref slot, ItemID.TeamBlockPink, 1);
 			AddRequestToShop(items, ref slot, ItemID.TeamBlockYellow, 1);
@@ -297,29 +315,6 @@ namespace SaneRNG.Common.NPCs {
 			slot++;
 		}
 
-		public override void PreUpdateWorld() {
-			if (SaneRNG.DEBUG) {
-				ForceSpawnTravelingMerchant();
-			}
-		}
-		private void ForceSpawnTravelingMerchant() {
-			if (Main.dayTime) {
-				int travelerIdx = NPC.FindFirstNPC(NPCID.TravellingMerchant);
-
-				if (travelerIdx == -1) {
-					int newTraveler = NPC.NewNPC(
-						Terraria.Entity.GetSource_TownSpawn(),
-						Main.spawnTileX * 16,
-						Main.spawnTileY * 16,
-						NPCID.TravellingMerchant
-					);
-					Main.npc[newTraveler].homeless = true;
-					Main.npc[newTraveler].netUpdate = true;
-				}
-			}
-		}
-
-
 		public static int PopRequest() {
 
 			if (requestedItems.Count == 0) {
@@ -350,9 +345,6 @@ namespace SaneRNG.Common.NPCs {
 				return;
 			}
 
-			Main.travelShop[slot] = ModContent.ItemType<RequestVoucher>();
-			slot++;
-
 			// Process requested items, skipping duplicates already in the shop
 			while (requestedItems.Count != 0) {
 				// Get our requested item
@@ -373,6 +365,9 @@ namespace SaneRNG.Common.NPCs {
 					break;
 				}
 			}
+
+			// Finally, add his request voucher.
+			Main.travelShop[slot] = ModContent.ItemType<RequestVoucher>();
 		}
 	}
 }
