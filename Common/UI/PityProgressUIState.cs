@@ -13,6 +13,7 @@ using Terraria.UI;
 using SaneRNG.Common.Player;
 using SaneRNG.Common.UI;
 using Terraria.GameContent.UI.Elements;
+using Terraria.GameInput;
 
 namespace SaneRNG.Common.UI {
 	public class PityProgressUIState : UIState {
@@ -97,12 +98,30 @@ namespace SaneRNG.Common.UI {
 			ProgressScrollbar.Recalculate();
 		}
 
+		private bool wasHoveringPanel = false;
+
 		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
 
-			// Only block mouse input when hovering over the panel
-			if (MainPanel.ContainsPoint(Main.MouseScreen)) {
-				Main.LocalPlayer.mouseInterface = true;
+			// Block all mouse and scroll input when hovering over the panel
+			bool isHoveringPanel = MainPanel.ContainsPoint(Main.MouseScreen);
+			if (isHoveringPanel) {
+				Terraria.Player player = Main.LocalPlayer;
+				player.mouseInterface = true;
+				player.cursorItemIconEnabled = false;
+
+				// Aggressively block tooltips
+				Main.hoverItemName = "";
+				Main.HoverItem = new Item();
+
+				wasHoveringPanel = true;
+			} else if (wasHoveringPanel) {
+				// Just left the panel - force clear scroll state
+				// Create a fake mouse event to clear hover state from all children
+				var fakeMouseEvent = new UIMouseEvent(ProgressList, Main.MouseScreen);
+				ProgressList.MouseOut(fakeMouseEvent);
+
+				wasHoveringPanel = false;
 			}
 
 			// Refresh the progress list every frame
@@ -293,6 +312,22 @@ namespace SaneRNG.Common.UI {
 			if (dragging) {
 				DragEnd(evt);
 			}
+		}
+
+		public override void RightMouseDown(UIMouseEvent evt) {
+			base.RightMouseDown(evt);
+			// Consume right click to prevent it from reaching elements underneath
+		}
+
+		public override void RightMouseUp(UIMouseEvent evt) {
+			base.RightMouseUp(evt);
+			// Consume right click to prevent it from reaching elements underneath
+		}
+
+		public override void MouseOver(UIMouseEvent evt) {
+			base.MouseOver(evt);
+			// Block tooltips from elements underneath by setting mouseInterface
+			Main.LocalPlayer.mouseInterface = true;
 		}
 
 		private void DragStart(UIMouseEvent evt) {
