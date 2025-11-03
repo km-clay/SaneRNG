@@ -1,1 +1,11 @@
-An overhaul for various pure RNG systems to also allow for deterministic loot.
+An opinionated game design overhaul for various pure RNG systems.
+
+Systems reworked by this mod include:
+
+- The Angler: All quest rewards are now sold at a shop. Quests now reward you with Angler Medals on top of the usual rewards, which you can use to buy quest rewards from his shop.
+- Traveling Merchant: Now brings an extra item with him on every visit - a Request Voucher. These Request Vouchers can be used to request a specific item to appear in his next inventory.
+- Chest Essence: Each loot chest in the world now contains an Essence item, along with it's usual loot. Four of these essence items can be combined to craft an item from that chest's loot table. There is a different essence for every chest type.
+- Pity Drops: Enemies are now guaranteed to drop items after the expected number of kills. If an item has a 1/100 drop rate, it will drop guaranteed after 100 kills. Works for normal drops and grab bags.
+- Boss Drop Shimmers: Various boss drops can be thrown into Shimmer to cycle through the items that boss can drop.
+
+Each of these systems can be enabled/disabled using the mod configuration.

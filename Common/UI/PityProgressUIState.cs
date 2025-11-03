@@ -128,7 +128,7 @@ namespace SaneRNG.Common.UI {
 			bool isSearching = !string.IsNullOrEmpty(searchText) && searchText != "Search...";
 
 			// Create a single list of all items with their pin status and sort priority
-			var allItems = new List<(int itemID, float progress, bool isPinned, int sortPriority)>();
+			var allItems = new List<(int itemID, double progress, bool isPinned, int sortPriority)>();
 
 			foreach (var kvp in player.itemProgress) {
 				// Apply search filter if needed
@@ -178,10 +178,10 @@ namespace SaneRNG.Common.UI {
 	// Custom UI element for displaying individual item progress
 	public class UIProgressItem : UIElement {
 		private int itemID;
-		private float progress;
+		private double progress;
 		private bool isPinned;
 
-		public UIProgressItem(int itemID, float progress, bool isPinned) {
+		public UIProgressItem(int itemID, double progress, bool isPinned) {
 			this.itemID = itemID;
 			this.progress = progress;
 			this.isPinned = isPinned;
@@ -199,6 +199,8 @@ namespace SaneRNG.Common.UI {
 				player.pinnedItems.Add(itemID);
 			}
 			SoundEngine.PlaySound(SoundID.MenuTick);
+			int playerIdx = Main.LocalPlayer.whoAmI;
+			player.SyncPlayer(playerIdx, playerIdx, false);
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
@@ -238,7 +240,7 @@ namespace SaneRNG.Common.UI {
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)barX, (int)barY, (int)barWidth, (int)barHeight), Color.Black * 0.5f);
 
 			// Filled portion of progress bar
-			float fillWidth = (barWidth - 4) * Math.Min(progress / 100f, 1f);
+			double fillWidth = (barWidth - 4) * Math.Min(progress / 100f, 1f);
 			Color barColor = progress >= 100f ? Color.Gold : Color.LimeGreen;
 			spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)barX + 2, (int)barY + 2, (int)fillWidth, (int)barHeight - 4), barColor * 0.8f);
 

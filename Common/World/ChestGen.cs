@@ -105,6 +105,7 @@ namespace SaneRNG.Common.World {
 		}
 
 		public override void PostWorldGen() {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableChestEssenceItems == false) return;
 			foreach (Chest chest in Main.chest) {
 				if (chest == null) {
 					continue;

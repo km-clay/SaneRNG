@@ -10,6 +10,7 @@ using Terraria.DataStructures;
 namespace SaneRNG.Common.NPCs {
 	public class SaneRNGAnglerGlobalNPC : GlobalNPC {
 		public override void ModifyActiveShop(NPC npc, string shopName, Item[] items) {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableAnglerShops == false) return;
 			if (npc.type != NPCID.Angler) return;
 
 			if (shopName == "SaneRNG:AnglerShop") {
@@ -23,15 +24,17 @@ namespace SaneRNG.Common.NPCs {
 
 	public class SaneRNGAngler : ModSystem {
 		public override void Load() {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableAnglerShops == false) return;
 			On_Player.GetAnglerReward += ReplaceAnglerReward;
 		}
 
 		public override void Unload() {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableAnglerShops == false) return;
 			On_Player.GetAnglerReward -= ReplaceAnglerReward;
 		}
 
 		private static void ReplaceAnglerReward(On_Player.orig_GetAnglerReward orig, Terraria.Player self, NPC angler, int questItemType) {
-			// Don't call orig() - we're replacing vanilla rewards entirely
+			orig(self, angler, questItemType);
 
 			int type = ModContent.ItemType<AnglerMedal>();
 			int stack = Main.rand.Next(2, 4); // 2-3 medals
@@ -98,18 +101,20 @@ namespace SaneRNG.Common.NPCs {
 			AddShopItem(items, ref slot, ItemID.FishCostumeShirt, 5);
 			AddShopItem(items, ref slot, ItemID.FishCostumeMask, 5);
 			AddShopItem(items, ref slot, ItemID.HighTestFishingLine, 5);
+			AddShopItem(items, ref slot, ItemID.AnglerEarring, 5);
+			AddShopItem(items, ref slot, ItemID.TackleBox, 5);
 			AddShopItem(items, ref slot, ItemID.FishermansGuide, 5);
 			AddShopItem(items, ref slot, ItemID.WeatherRadio, 5);
 			AddShopItem(items, ref slot, ItemID.Sextant, 5);
 			AddShopItem(items, ref slot, ItemID.FishingBobber, 8);
 
 			// Low value consumables - 1-4 medals
-			AddShopItem(items, ref slot, ItemID.FishingPotion, 2);
-			AddShopItem(items, ref slot, ItemID.SonarPotion, 2);
-			AddShopItem(items, ref slot, ItemID.CratePotion, 2);
-			AddShopItem(items, ref slot, ItemID.MasterBait, 4);
-			AddShopItem(items, ref slot, ItemID.JourneymanBait, 3);
-			AddShopItem(items, ref slot, ItemID.ApprenticeBait, 2);
+			AddShopItem(items, ref slot, ItemID.FishingPotion, 2, 3);
+			AddShopItem(items, ref slot, ItemID.SonarPotion, 2, 3);
+			AddShopItem(items, ref slot, ItemID.CratePotion, 2, 3);
+			AddShopItem(items, ref slot, ItemID.MasterBait, 2, 3);
+			AddShopItem(items, ref slot, ItemID.JourneymanBait, 2, 5);
+			AddShopItem(items, ref slot, ItemID.ApprenticeBait, 2, 10);
 		}
 
 		public static void PopulateAnglerDecor(Item[] items) {
@@ -140,6 +145,16 @@ namespace SaneRNG.Common.NPCs {
 		private static void AddShopItem(Item[] items, ref int slot, int itemID, int medalPrice) {
 			Item item = new Item();
 			item.SetDefaults(itemID);
+			item.shopCustomPrice = medalPrice;
+			item.shopSpecialCurrency = AnglerMedalCurrency.id;
+			items[slot] = item;
+			slot++;
+		}
+
+		private static void AddShopItem(Item[] items, ref int slot, int itemID, int medalPrice, int stackSize) {
+			Item item = new Item();
+			item.SetDefaults(itemID);
+			item.stack = stackSize;
 			item.shopCustomPrice = medalPrice;
 			item.shopSpecialCurrency = AnglerMedalCurrency.id;
 			items[slot] = item;

@@ -10,6 +10,7 @@ namespace SaneRNG.Common.Items {
 		protected virtual int RequiredEssence => 4;
 
 		public void RegisterEssenceRecipes() {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableChestEssenceItems == false) return;
 			foreach (int itemID in GetCraftables()) {
 				Recipe.Create(itemID)
 					.AddIngredient(Type, RequiredEssence)

@@ -8,17 +8,27 @@ using System.Collections.Generic;
 using System.Linq;
 using SaneRNG.Content.Items;
 using SaneRNG.Content.Currencies;
+using SaneRNG.Common.Player;
 using Microsoft.Xna.Framework;
 
 namespace SaneRNG.Common.NPCs {
 	public class SaneRNGGlobalNPC : GlobalNPC {
 		public override void OnSpawn(NPC npc, IEntitySource source) {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableTravelingMerchantRequests == false) return;
 			if (npc.type == NPCID.TravellingMerchant) {
-				SaneRNGTravelingMerchant.SetupTravelShopWithRequests();
+				SaneRNGTravelingMerchant.hasTakenVoucherThisVisit.Clear();
+
+				if (Main.netMode == NetmodeID.Server) {
+					ModPacket packet = Mod.GetPacket();
+					packet.Write(PityDropsPacketType.VoucherUpdate);
+					packet.Write(true);
+					packet.Send(toClient: -1);
+				}
 			};
 		}
 
 		public override void ModifyActiveShop(NPC npc, string shopName, Item[] items) {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableTravelingMerchantRequests == false) return;
 			if (npc.type != NPCID.TravellingMerchant) return;
 
 			if (shopName == "SaneRNG:RequestsPage1") {
@@ -29,6 +39,8 @@ namespace SaneRNG.Common.NPCs {
 			}
 			else if (shopName == "SaneRNG:RequestsPage3") {
 				SaneRNGTravelingMerchant.PopulateRequestsPage3(items, npc);
+			} else {
+				SaneRNGTravelingMerchant.AddRequestsAndVoucher(items);
 			}
 		}
 	}
@@ -44,6 +56,7 @@ namespace SaneRNG.Common.NPCs {
 		}
 
 		public override bool CanBuyItem(NPC vendor, Item[] shopInventory, Item item) {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableTravelingMerchantRequests == false) return true;
 			if (vendor.type != NPCID.TravellingMerchant) return true;
 
 			// Handle request item purchase - queue the request instead of buying
@@ -85,6 +98,7 @@ namespace SaneRNG.Common.NPCs {
 		}
 
 		public override void PostBuyItem(NPC vendor, Item[] shopInventory, Item item) {
+			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableTravelingMerchantRequests == false) return;
 			if (vendor.type != NPCID.TravellingMerchant) return;
 
 			// Handle voucher purchase - remove from shop after buying
@@ -99,11 +113,27 @@ namespace SaneRNG.Common.NPCs {
 					}
 				}
 			}
+
+			int playerIdx = Player.whoAmI;
+			SaneRNGTravelingMerchant.hasTakenVoucherThisVisit.Add(playerIdx);
+
+			if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+			ModPacket packet = Mod.GetPacket();
+
+			packet.Write(PityDropsPacketType.VoucherUpdate);
+
+			packet.Write(false);
+			packet.Write(playerIdx);
+
+			packet.Send(toClient: -1);
 		}
+
 	}
 
 	public class SaneRNGTravelingMerchant : ModSystem {
-		public static Queue<int> requestedItems = new Queue<int>();
+		public static Queue<int> requestedItems = new();
+		public static HashSet<int> hasTakenVoucherThisVisit = new();
 
 		public override void PostSetupContent() {
 			RequestVoucherCurrency.id = CustomCurrencyManager.RegisterCurrency(
@@ -195,6 +225,7 @@ namespace SaneRNG.Common.NPCs {
 				AddRequestToShop(items, ref slot, ItemID.Keybrand, 2);
 			}
 
+			AddRequestToShop(items, ref slot, ItemID.UltrabrightTorch, 1);
 			AddRequestToShop(items, ref slot, ItemID.ActuationAccessory, 2);
 			AddRequestToShop(items, ref slot, ItemID.PortableCementMixer, 2);
 			AddRequestToShop(items, ref slot, ItemID.PaintSprayer, 2);
@@ -328,6 +359,32 @@ namespace SaneRNG.Common.NPCs {
 
 		public static void PushRequest(int Request) {
 			requestedItems.Enqueue(Request);
+		}
+
+		public static void AddRequestsAndVoucher(Item[] items) {
+			int slot = 0;
+			while (slot < items.Length && items[slot] != null && items[slot].type != ItemID.None) {
+				slot++;
+			}
+
+			if (slot == items.Length) return;
+
+			while (requestedItems.Count != 0) {
+				int request = PopRequest();
+
+				if (items.Any(item => item != null && item.type == request)) continue;
+
+				Item requested = new Item();
+				requested.SetDefaults(request);
+				items[slot] = requested;
+				slot++;
+			}
+
+			if (slot < items.Length && !hasTakenVoucherThisVisit.Contains(Main.LocalPlayer.whoAmI)) {
+				Item voucher = new Item();
+				voucher.SetDefaults(ModContent.ItemType<RequestVoucher>());
+				items[slot] = voucher;
+			}
 		}
 
 		public static void SetupTravelShopWithRequests() {

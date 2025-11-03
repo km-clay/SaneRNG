@@ -61,7 +61,7 @@ Items: {
 
 	LivingWoodEssence: {
 		DisplayName: Living Wood Essence
-		Tooltip: ""
+		Tooltip: The essence of an item that can appear in Living Wood chests.
 	}
 }
 
@@ -70,4 +70,40 @@ Currencies: {
 	AnglerMedalCurrency: angler medal
 }
 
-"Keybinds.Open Progress Tracker.DisplayName": Open  Progress  Tracker
+"Keybinds.Open Progress Tracker.DisplayName": Open Progress Tracker
+
+Configs: {
+	SaneRNGServerConfig: {
+		DisplayName: Sane R N G Server Config
+
+		EnablePityDrops: {
+			Label: Enable Pity Drops
+			Tooltip: Enable the pity system for various RNG item drop sources.
+		}
+
+		EnableExtractinatorPity: {
+			Label: Enable Extractinator Pity
+			Tooltip: Enable the pity system for extractinator drops. Can make platinum coin drops and other rare drops unreasonably uncommon.
+		}
+
+		EnableBossDropShimmer: {
+			Label: Enable Boss Drop Shimmer
+			Tooltip: Enable boss drop cycling via Shimmer.
+		}
+
+		EnableAnglerShops: {
+			Label: Enable Angler Shops
+			Tooltip: Enable the angler shop system, and replace quest rewards with Angler Medals.
+		}
+
+		EnableTravelingMerchantRequests: {
+			Label: Enable Traveling Merchant Requests
+			Tooltip: Enable the Traveling Merchant request system.
+		}
+
+		EnableChestEssenceItems: {
+			Label: Enable Chest Essence Items
+			Tooltip: Enable chest essence items. Note that this setting only has an effect on world gen.
+		}
+	}
+}
