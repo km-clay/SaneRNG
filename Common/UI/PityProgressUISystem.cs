@@ -74,15 +74,6 @@ namespace SaneRNG.Common.UI {
 					layers.Insert(mouseTextIndex + 1, new LegacyGameInterfaceLayer(
 						"SaneRNG: Pity Progress Tracker",
 						delegate {
-							// Clear any tooltips that were set while mouse was blocked
-							if (mouseCache != null && pityProgressUI.MainPanel.ContainsPoint(Main.MouseScreen)) {
-								Main.hoverItemName = "";
-								Main.HoverItem = new Item();
-								Main.mouseText = false;
-								Main.instance.MouseText("");
-								Main.ItemIconCacheUpdate(0);
-							}
-
 							if (mouseCache != null) {
 								mouseCache.RestoreMouse();
 								mouseCache = null;
@@ -91,6 +82,27 @@ namespace SaneRNG.Common.UI {
 							if (pityProgressInterface?.CurrentState != null) {
 								pityProgressInterface.Draw(Main.spriteBatch, new GameTime());
 							}
+
+							// Handle tooltips for our UI - always check when hovering panel
+							if (pityProgressInterface?.CurrentState != null && pityProgressUI.MainPanel.ContainsPoint(Main.MouseScreen)) {
+								Item tooltipItem = pityProgressUI.GetHoveredItem();
+								if (tooltipItem != null && !tooltipItem.IsAir) {
+									// We're hovering an item icon - show our tooltip
+									Main.HoverItem = tooltipItem;
+									Main.hoverItemName = tooltipItem.Name;
+									Main.mouseText = true;
+									// Force the tooltip to be visible
+									Main.instance.MouseText(tooltipItem.Name, tooltipItem.rare, 0);
+								} else {
+									// Hovering panel but not an item icon - clear tooltips to prevent bleedthrough
+									Main.hoverItemName = "";
+									Main.HoverItem = new Item();
+									Main.mouseText = false;
+									Main.instance.MouseText("");
+									Main.ItemIconCacheUpdate(0);
+								}
+							}
+
 							return true;
 						},
 						InterfaceScaleType.UI)

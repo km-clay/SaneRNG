@@ -100,6 +100,16 @@ namespace SaneRNG.Common.UI {
 
 		private bool wasHoveringPanel = false;
 
+		public Item GetHoveredItem() {
+			// Check if the mouse is hovering over any item icon in the progress list
+			foreach (UIElement element in ProgressList._items) {
+				if (element is UIProgressItem progressItem && progressItem.IsHoveringIcon()) {
+					return progressItem.GetItemForTooltip();
+				}
+			}
+			return null;
+		}
+
 		public override void Update(GameTime gameTime) {
 			base.Update(gameTime);
 
@@ -109,10 +119,6 @@ namespace SaneRNG.Common.UI {
 				Terraria.Player player = Main.LocalPlayer;
 				player.mouseInterface = true;
 				player.cursorItemIconEnabled = false;
-
-				// Aggressively block tooltips
-				Main.hoverItemName = "";
-				Main.HoverItem = new Item();
 
 				wasHoveringPanel = true;
 			} else if (wasHoveringPanel) {
@@ -199,6 +205,7 @@ namespace SaneRNG.Common.UI {
 		private int itemID;
 		private double progress;
 		private bool isPinned;
+		private Rectangle iconHitbox;
 
 		public UIProgressItem(int itemID, double progress, bool isPinned) {
 			this.itemID = itemID;
@@ -222,6 +229,16 @@ namespace SaneRNG.Common.UI {
 			player.SyncPlayer(playerIdx, playerIdx, false);
 		}
 
+		public bool IsHoveringIcon() {
+			return iconHitbox.Contains(Main.MouseScreen.ToPoint());
+		}
+
+		public Item GetItemForTooltip() {
+			Item item = new Item();
+			item.SetDefaults(itemID);
+			return item;
+		}
+
 		protected override void DrawSelf(SpriteBatch spriteBatch) {
 			CalculatedStyle dimensions = GetDimensions();
 			float x = dimensions.X;
@@ -238,6 +255,9 @@ namespace SaneRNG.Common.UI {
 			float scale = 32f / Math.Max(itemTexture.Width, itemTexture.Height);
 			float iconX = isPinned ? 35f : 25f;
 			spriteBatch.Draw(itemTexture, new Vector2(x + iconX, y + 25), null, Color.White, 0f, itemTexture.Size() / 2f, scale, SpriteEffects.None, 0f);
+
+			// Calculate icon hitbox for tooltip detection (approximate 32x32 box centered on icon)
+			iconHitbox = new Rectangle((int)(x + iconX - 16), (int)(y + 25 - 16), 32, 32);
 
 			// Draw pin indicator if pinned (draw AFTER icon so it appears on top)
 			if (isPinned) {
