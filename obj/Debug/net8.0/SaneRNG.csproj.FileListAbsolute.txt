@@ -1,5 +1,0 @@
-/home/pagedmov/.local/share/Terraria/tModLoader/ModSources/SaneRNG/obj/Debug/net8.0/SaneRNG.csproj.AssemblyReference.cache
-/home/pagedmov/.local/share/Terraria/tModLoader/ModSources/SaneRNG/obj/Debug/net8.0/SaneRNG.GeneratedMSBuildEditorConfig.editorconfig
-/home/pagedmov/.local/share/Terraria/tModLoader/ModSources/SaneRNG/obj/Debug/net8.0/SaneRNG.AssemblyInfoInputs.cache
-/home/pagedmov/.local/share/Terraria/tModLoader/ModSources/SaneRNG/obj/Debug/net8.0/SaneRNG.AssemblyInfo.cs
-/home/pagedmov/.local/share/Terraria/tModLoader/ModSources/SaneRNG/obj/Debug/net8.0/SaneRNG.csproj.CoreCompileInputs.cache
