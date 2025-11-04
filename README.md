@@ -1,0 +1,33 @@
+# Sane RNG
+
+Sane RNG is a Terraria mod for tModLoader that hopes to make the game more respectful of your time.
+All of the following features can be enabled or disabled to your liking using the mod configuration menu.
+
+## Angler Shops
+The Angler now has two shops (one for functional items, one for decorations), which use Angler Medals as currency. Angler quests now reward Angler Medals on top of the usual items.
+
+## Traveling Merchant Item Requests
+The Traveling Merchant now has a new dialogue option. Using Request Vouchers, you can choose items to request for his next visit. Requested items are guaranteed to appear in his next inventory. The Traveling Merchant brings one free Request Voucher with him on each visit.
+
+## Boss Drop Shimmer Transformations
+Many bosses drop "one of X items", and the items it chooses from are usually class-specific weapons or accessories. This behavior can be pretty annoying when you are building for a specific class, and end up having to fight the same boss many times to get the specific item you want.
+
+All boss drops from these "guaranteed drop" tables can now be shimmered to cycle through the other options. For instance, with Duke Fishron's drops: Bubble Gun → Flairon → Razorblade Typhoon → Tempest Staff → Tsunami → (loops back to Bubble Gun).
+
+Note: This only affects vanilla bosses. Mod boss drops will remain unchanged.
+
+## Chest Essence
+All chests that spawn naturally in the world now contain one additional new item: an Essence of the location where that chest was found. Four Essences can be combined at a demon altar to craft any item from that chest's loot table. For instance, after opening four Frozen Chests, you can use Ice Essence to craft a pair of Ice Skates. All loot chests in the world have a corresponding Essence item, including dungeon chests and floating island chests.
+
+The goal of this system is to provide a direct means of obtaining specific chest items without changing the way the game is played, or removing the fun of randomly finding useful items in chests. In practice, the only thing that changes is that you no longer experience opening 30+ chests looking for a single item and somehow not finding it, before giving up and googling a world seed for the item you want. With the essence system, you are at most four chests away from your item at any time.
+
+## Item Drop Pity System
+All items are guaranteed to drop after their expected number of kills. This means that if an item has a 1/100 drop rate from a specific enemy, it is guaranteed to drop on the 100th kill. This works per item and not per enemy, so if several enemies drop a specific item rarely (biome keys, slime staff, etc.), killing any of them will count toward a guaranteed drop.
+
+This works by simply adding the enemy's drop chance to your progress toward an item. So if an item has a 2% drop rate from one enemy, and a 5% drop rate from another enemy, killing both means you have a total of 7% progress toward that item. Once your progress reaches 100%, you will get a guaranteed drop.
+
+Natural item drops will reset your progress toward the item, since the goal of this system is not to increase the overall number of items dropped, but to simply ensure that you do not experience annoying statistical anomalies while you are playing.
+
+This system is mainly for enemy item drops, but also affects some other RNG-based item sources such as the Extractinator and Treasure Bags.
+
+Additionally, a UI progress tracker for item drops is included. It is opened with a hotkey that can be set on the controls menu, default key is P. The tracker contains a search bar, and specific items can be pinned to the top of the list by clicking on them. It's fully resizable and can comfortably be kept on screen while farming specific items. Items will only be contained in the tracker's list if you have killed an enemy that drops said item.
