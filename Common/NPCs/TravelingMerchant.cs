@@ -1,5 +1,4 @@
 using Terraria;
-using Terraria.GameContent.UI;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Terraria.DataStructures;
@@ -10,13 +9,24 @@ using SaneRNG.Content.Items;
 using SaneRNG.Content.Currencies;
 using SaneRNG.Common.Player;
 using Microsoft.Xna.Framework;
+using Terraria.GameContent.UI;
 
 namespace SaneRNG.Common.NPCs {
 	public class SaneRNGGlobalNPC : GlobalNPC {
 		public override void OnSpawn(NPC npc, IEntitySource source) {
 			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableTravelingMerchantRequests == false) return;
 			if (npc.type == NPCID.TravellingMerchant) {
+				// Only process requests once per visit - prevents duplicate processing on client rejoins
+				if (SaneRNGTravelingMerchant.hasProcessedRequestsThisVisit) return;
+
 				SaneRNGTravelingMerchant.hasTakenVoucherThisVisit.Clear();
+				SaneRNGTravelingMerchant.requestsThisVisit.Clear();
+
+				while (SaneRNGTravelingMerchant.requestedItems.Count > 0) {
+					SaneRNGTravelingMerchant.requestsThisVisit.Add(SaneRNGTravelingMerchant.requestedItems.Dequeue());
+				}
+
+				SaneRNGTravelingMerchant.hasProcessedRequestsThisVisit = true;
 
 				if (Main.netMode == NetmodeID.Server) {
 					ModPacket packet = Mod.GetPacket();
@@ -132,8 +142,10 @@ namespace SaneRNG.Common.NPCs {
 	}
 
 	public class SaneRNGTravelingMerchant : ModSystem {
+		public static List<int> requestsThisVisit = new();
 		public static Queue<int> requestedItems = new();
 		public static HashSet<int> hasTakenVoucherThisVisit = new();
+		public static bool hasProcessedRequestsThisVisit = false;
 
 		public override void PostSetupContent() {
 			RequestVoucherCurrency.id = CustomCurrencyManager.RegisterCurrency(
@@ -157,6 +169,12 @@ namespace SaneRNG.Common.NPCs {
 		}
 
 		public override void PreUpdateWorld() {
+			// Reset the flag when the merchant despawns (no longer present in world)
+			int merchantIdx = NPC.FindFirstNPC(NPCID.TravellingMerchant);
+			if (merchantIdx == -1 && hasProcessedRequestsThisVisit) {
+				hasProcessedRequestsThisVisit = false;
+			}
+
 			if (SaneRNG.DEBUG) {
 				ForceSpawnTravelingMerchant();
 			}
@@ -346,17 +364,6 @@ namespace SaneRNG.Common.NPCs {
 			slot++;
 		}
 
-		public static int PopRequest() {
-
-			if (requestedItems.Count == 0) {
-				return -1;
-			}
-
-			int lastRequest = requestedItems.Dequeue();
-
-			return lastRequest;
-		}
-
 		public static void PushRequest(int Request) {
 			requestedItems.Enqueue(Request);
 		}
@@ -369,9 +376,7 @@ namespace SaneRNG.Common.NPCs {
 
 			if (slot == items.Length) return;
 
-			while (requestedItems.Count != 0) {
-				int request = PopRequest();
-
+			foreach (int request in requestsThisVisit) {
 				if (items.Any(item => item != null && item.type == request)) continue;
 
 				Item requested = new Item();
@@ -385,46 +390,6 @@ namespace SaneRNG.Common.NPCs {
 				voucher.SetDefaults(ModContent.ItemType<RequestVoucher>());
 				items[slot] = voucher;
 			}
-		}
-
-		public static void SetupTravelShopWithRequests() {
-			Chest.SetupTravelShop();
-
-			// Get all items currently in the vanilla shop (excluding None)
-			var existingShopItems = Main.travelShop.Where(id => id != ItemID.None).ToHashSet();
-
-			int slot = 0;
-			while (slot < Main.travelShop.Length && Main.travelShop[slot] != ItemID.None) {
-				slot++;
-			}
-
-			if (slot == Main.travelShop.Length) {
-				return;
-			}
-
-			// Process requested items, skipping duplicates already in the shop
-			while (requestedItems.Count != 0) {
-				// Get our requested item
-				int request = PopRequest();
-
-				// Skip if this item is already in the vanilla shop
-				if (existingShopItems.Contains(request)) {
-					continue;
-				}
-
-				// Add it to the next open slot
-				Main.travelShop[slot] = request;
-				slot++;
-
-				// If we ran out of space, break.
-				// This is an extreme case though, I am doubtful that it will ever happen in practice.
-				if (slot == Main.travelShop.Length) {
-					break;
-				}
-			}
-
-			// Finally, add his request voucher.
-			Main.travelShop[slot] = ModContent.ItemType<RequestVoucher>();
 		}
 	}
 }

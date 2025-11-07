@@ -46,6 +46,7 @@ namespace SaneRNG.Content.Items {
 		}
 		protected override int[] GetCraftables() {
 			return new int[] {
+				ItemID.Extractinator,
 				ItemID.BandofRegeneration,
 				ItemID.MagicMirror,
 				ItemID.CloudinaBottle,

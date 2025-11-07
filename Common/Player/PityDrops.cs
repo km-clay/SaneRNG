@@ -168,59 +168,6 @@ namespace SaneRNG.Common.Player {
 	}
 
 	public class PityDropsGrabBags : GlobalItem {
-		private static int[] grabBags = [
-			ItemID.WoodenCrate,
-			ItemID.WoodenCrateHard,
-			ItemID.IronCrate,
-			ItemID.IronCrateHard,
-			ItemID.GoldenCrate,
-			ItemID.GoldenCrateHard,
-			ItemID.JungleFishingCrate,
-			ItemID.JungleFishingCrateHard,
-			ItemID.FloatingIslandFishingCrate,
-			ItemID.FloatingIslandFishingCrateHard,
-			ItemID.CorruptFishingCrate,
-			ItemID.CorruptFishingCrateHard,
-			ItemID.CrimsonFishingCrate,
-			ItemID.CrimsonFishingCrateHard,
-			ItemID.HallowedFishingCrate,
-			ItemID.HallowedFishingCrateHard,
-			ItemID.DungeonFishingCrate,
-			ItemID.DungeonFishingCrateHard,
-			ItemID.FrozenCrate,
-			ItemID.FrozenCrateHard,
-			ItemID.OasisCrate,
-			ItemID.OasisCrateHard,
-			ItemID.LavaCrate,
-			ItemID.LavaCrateHard,
-			ItemID.OceanCrate,
-			ItemID.OceanCrateHard,
-			ItemID.HerbBag,
-			ItemID.CanOfWorms,
-			ItemID.LockBox,
-			ItemID.ObsidianLockbox,
-			ItemID.Oyster,
-			ItemID.GoodieBag,
-			ItemID.Present,
-			ItemID.BossBagBetsy,
-			ItemID.DeerclopsBossBag,
-			ItemID.KingSlimeBossBag,
-			ItemID.EyeOfCthulhuBossBag,
-			ItemID.EaterOfWorldsBossBag,
-			ItemID.BrainOfCthulhuBossBag,
-			ItemID.QueenBeeBossBag,
-			ItemID.SkeletronBossBag,
-			ItemID.WallOfFleshBossBag,
-			ItemID.QueenSlimeBossBag,
-			ItemID.DestroyerBossBag,
-			ItemID.TwinsBossBag,
-			ItemID.SkeletronPrimeBossBag,
-			ItemID.PlanteraBossBag,
-			ItemID.GolemBossBag,
-			ItemID.FishronBossBag,
-			ItemID.FairyQueenBossBag,
-		];
-
 		private List<(int ItemID, float dropRate)> GetItemDrops(Item item, Terraria.Player player) {
 			var result = new List<(int,float)>();
 
@@ -258,8 +205,6 @@ namespace SaneRNG.Common.Player {
 		}
 
 		public override bool ConsumeItem(Item item, Terraria.Player player) {
-			if (!grabBags.Contains(item.type)) return true;
-
 			var modPlayer = player.GetModPlayer<PityDropsPlayer>();
 			modPlayer.PruneRecentDrops();
 			var drops = GetItemDrops(item, player);
