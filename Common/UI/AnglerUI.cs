@@ -7,6 +7,7 @@ using Terraria.GameContent;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.Localization;
+using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
@@ -182,6 +183,17 @@ namespace SaneRNG.Common.UI {
 			Main.stackSplit = 9999;
 			Main.npcChatText = "";
 			Main.SetNPCShopIndex(1);
+			var shopExists = NPCShopDatabase.TryGetNPCShop(shopName, out var shop);
+			var controlShopExists = NPCShopDatabase.TryGetNPCShop("AnglerShop", out var controlShop);
+			var entries = NPCShopDatabase.AllShops;
+			var entryString = "";
+			foreach (var entry in entries) {
+				entryString += entry.FullName + ", ";
+			}
+			Main.NewText("Opening " + shopName + " shop.", 255, 240, 20);
+			Main.NewText("Shop exists: " + shopExists, 255, 240, 20);
+			Main.NewText("Control shop exists: " + controlShopExists, 255, 240, 20);
+			Main.NewText("All shops: " + entryString, 255, 240, 20);
 			Main.instance.shop[Main.npcShop].SetupShop(shopName, Main.LocalPlayer.TalkNPC);
 			SoundEngine.PlaySound(SoundID.MenuTick);
 		}

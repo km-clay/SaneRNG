@@ -18,6 +18,7 @@ namespace SaneRNG.Common.Player {
 		public const byte ProgressUpdate = 1;
 		public const byte PinUpdate = 2;
 		public const byte VoucherUpdate = 3;
+		public const byte RequestItem = 4;
 	}
 
 	public class PityDropsExtractinator : GlobalItem {
@@ -383,6 +384,7 @@ namespace SaneRNG.Common.NPCs {
 
 		public override void OnKill(NPC npc) {
 			if (ModContent.GetInstance<SaneRNGServerConfig>().EnablePityDrops == false) return;
+		  if (npc.lastInteraction < 0 || npc.lastInteraction >= 255) return;
 			Terraria.Player killer = Main.player[npc.lastInteraction];
 			var player = killer.GetModPlayer<PityDropsPlayer>();
 			player.PruneRecentDrops();

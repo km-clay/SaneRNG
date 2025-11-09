@@ -6,6 +6,9 @@ using SaneRNG.Content.Currencies;
 using SaneRNG.Content.Items;
 using System.Collections.Generic;
 using Terraria.DataStructures;
+using Terraria.ModLoader.Default;
+using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace SaneRNG.Common.NPCs {
 	public class SaneRNGAnglerGlobalNPC : GlobalNPC {
@@ -15,9 +18,65 @@ namespace SaneRNG.Common.NPCs {
 
 			if (shopName == "SaneRNG:AnglerShop") {
 				SaneRNGAngler.PopulateAnglerShop(items);
+				if (IsThisGuyAtTheFuckingOcean() || IsThisGuyNearThisOtherFuckingNPC(npc)) {
+					AddTheFuckingPylons(items);
+				}
 			}
 			else if (shopName == "SaneRNG:AnglerDecor") {
 				SaneRNGAngler.PopulateAnglerDecor(items);
+			}
+		}
+
+		// Hardcode of shame
+		private bool IsThisGuyAtTheFuckingOcean() => Main.LocalPlayer.ZoneBeach;
+		private bool IsThisGuyNearThisOtherFuckingNPC(NPC npc) {
+			int[] likedNPCs = [
+				NPCID.Princess,
+				NPCID.PartyGirl,
+				NPCID.Demolitionist,
+				NPCID.TaxCollector
+			];
+			Vector2 anglerPos = npc.Center;
+			foreach (NPC otherNpc in Main.npc) {
+				Vector2 otherNpcPos = otherNpc.Center;
+				int distance = (int)Vector2.Distance(anglerPos, otherNpcPos);
+				if (distance <= 500 && likedNPCs.Contains(otherNpc.type)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		private List<int> GetTheFuckingPylons() {
+			List<int> pylons = [];
+			if (Main.LocalPlayer.ZoneForest) {
+				pylons.Add(ItemID.TeleportationPylonPurity);
+			} else if (Main.LocalPlayer.ZoneDesert) {
+				pylons.Add(ItemID.TeleportationPylonDesert);
+			} else if (Main.LocalPlayer.ZoneJungle) {
+				pylons.Add(ItemID.TeleportationPylonJungle);
+			} else if (Main.LocalPlayer.ZoneSnow) {
+				pylons.Add(ItemID.TeleportationPylonSnow);
+			} else if (Main.LocalPlayer.ZoneHallow) {
+				pylons.Add(ItemID.TeleportationPylonHallow);
+			} else if (Main.LocalPlayer.ZoneGlowshroom) {
+				pylons.Add(ItemID.TeleportationPylonMushroom);
+			} else if (Main.LocalPlayer.ZoneBeach) {
+				pylons.Add(ItemID.TeleportationPylonOcean);
+			} else if (Main.LocalPlayer.ZoneNormalCaverns) {
+				pylons.Add(ItemID.TeleportationPylonUnderground);
+			}
+
+			return pylons;
+		}
+		private void AddTheFuckingPylons(Item[] items) {
+			Stack<int> pylons = new(GetTheFuckingPylons());
+
+			for (int i = 0; i < items.Length; i++) {
+				if (items[i] != null) continue;
+
+				if (!pylons.TryPop(out int result)) break;
+				Item item = new Item(result);
+				items[i] = item;
 			}
 		}
 	}

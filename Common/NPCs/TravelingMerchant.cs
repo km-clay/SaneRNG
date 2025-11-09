@@ -88,6 +88,15 @@ namespace SaneRNG.Common.NPCs {
 
 					// Queue the request
 					SaneRNGTravelingMerchant.PushRequest(item.type);
+					if (Main.netMode == NetmodeID.MultiplayerClient) {
+						ModPacket packet = Mod.GetPacket();
+
+						packet.Write(PityDropsPacketType.RequestItem);
+
+						packet.Write(item.type);
+						packet.Send(toClient: -1);
+					}
+
 					Main.NewText($"Requested {item.Name} for next visit!", Color.BlueViolet);
 
 					// Play request sound

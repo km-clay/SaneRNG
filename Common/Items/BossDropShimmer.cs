@@ -1,304 +1,127 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Terraria;
-using Terraria.ID;
+using Terraria.GameContent.ItemDropRules;
 using Terraria.ModLoader;
 
 namespace SaneRNG.Common.Items {
-	public abstract class DropNode : ShimmerManager {
-		protected virtual int[][] DropTables => [];
+	public class BossDropShimmers : ShimmerManager {
+		public static void RegisterBossShimmers() {
+			BossDropShimmers manager = new();
 
-		public abstract void Traverse();
-	}
+			for (int npcID = -65; npcID < NPCLoader.NPCCount; npcID++) {
+				NPC npc = new NPC();
+				npc.SetDefaults(npcID);
 
-	public abstract class DropChild : DropNode {
-		public override void Traverse() {
-			RegisterShimmerTransformations(DropTables);
-		}
-	}
+				if (!npc.boss) continue;
 
-	public class BossDropTree : DropNode {
-		private DropNode[] children = [
-			new QueenBeeDrops(),
-			new DeerclopsDrops(),
-			new SkeletronDrops(),
-			new WallOfFleshDrops(),
-			new KingSlimeDrops(),
-			new QueenSlimeDrops(),
-			new PlanteraDrops(),
-			new GolemDrops(),
-			new DukeFishronDrops(),
-			new EmpressOfLightDrops(),
-			new MoonLordDrops(),
-			new DarkMageDrops(),
-			new OgreDrops(),
-			new BetsyDrops(),
-			new MourningWoodDrops(),
-			new PumpkingDrops(),
-			new EverscreamDrops(),
-			new SantankDrops(),
-			new IceQueenDrops(),
-			new MartianSaucerDrops(),
-		];
 
-		public override void Traverse() {
-			foreach (var child in children) {
-				child.Traverse();
+				var rules = Main.ItemDropsDB.GetRulesForNPCID(npcID,false);
+
+				List<List<int>> dropGroups = ExtractOneFromOptionsGroups(rules);
+
+				foreach (var group in dropGroups) {
+					if (group.Count > 1) {
+						manager.RegisterShimmerTransformations(group.ToArray());
+					}
+				}
 			}
 		}
-	}
 
-	public class QueenBeeDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.BeeGun,
-				ItemID.BeeKeeper,
-				ItemID.BeesKnees,
-			],
-			[
-				ItemID.HiveWand,
-				ItemID.BeeHat,
-				ItemID.BeeShirt,
-				ItemID.BeePants,
-			]
-		];
-	}
+		private static int GetItemIdFromRule(IItemDropRule rule) {
+			var itemIdField = rule.GetType().GetField("itemId");
+			if (itemIdField != null && itemIdField.FieldType == typeof(int)) {
+				return (int)itemIdField.GetValue(rule);
+			}
+			return -1;
+		}
 
-	public class DeerclopsDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.PewMaticHorn,
-				ItemID.WeatherPain,
-				ItemID.HoundiusShootius,
-				ItemID.LucyTheAxe,
-			]
-		];
-	}
+		private static List<List<int>> ExtractOneFromOptionsGroups(List<IItemDropRule> rules) {
+			List<List<int>> result = new();
 
-	public class SkeletronDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.SkeletronMask,
-				ItemID.SkeletronHand,
-				ItemID.BookofSkulls,
-			]
-		];
-	}
+			foreach (var rule in rules) {
+				if (rule is OneFromOptionsDropRule oneFromOptions) {
+					List<int> group = new();
+					foreach(int itemID in oneFromOptions.dropIds) {
+						group.Add(itemID);
+					}
+					if (group.Count > 1) {
+						result.Add(group);
+					}
+				}
 
-	public class WallOfFleshDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.BreakerBlade,
-				ItemID.ClockworkAssaultRifle,
-				ItemID.LaserRifle,
-				ItemID.FireWhip,
-			],
-			[
-				ItemID.WarriorEmblem,
-				ItemID.RangerEmblem,
-				ItemID.SorcererEmblem,
-				ItemID.SummonerEmblem,
-			]
-		];
-	}
+				if (rule is OneFromOptionsNotScaledWithLuckDropRule oneFromOptionsNoLuck) {
+					List<int> group = new();
+					foreach(int itemID in oneFromOptionsNoLuck.dropIds) {
+						group.Add(itemID);
+					}
+					if (group.Count > 1) {
+						result.Add(group);
+					}
+				}
 
-	public class KingSlimeDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.NinjaHood,
-				ItemID.NinjaShirt,
-				ItemID.NinjaPants,
-			],
-			[
-				ItemID.SlimeHook,
-				ItemID.SlimeGun,
-			]
-		];
-	}
+				if (rule is FromOptionsWithoutRepeatsDropRule fromOptionsNoRepeats) {
+					List<int> group = new();
+					foreach(int itemID in fromOptionsNoRepeats.dropIds) {
+						group.Add(itemID);
+					}
+					if (group.Count > 1) {
+						result.Add(group);
+					}
+				}
 
-	public class QueenSlimeDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.CrystalNinjaHelmet,
-				ItemID.CrystalNinjaChestplate,
-				ItemID.CrystalNinjaLeggings,
-			]
-		];
-	}
+				if (rule is OneFromRulesRule oneFromRules) {
+					List<int> group = new();
+					foreach (var optionRule in oneFromRules.options) {
+						int itemId = GetItemIdFromRule(optionRule);
+						if (itemId != -1) {
+							group.Add(itemId);
+						}
+					}
 
-	public class PlanteraDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.GrenadeLauncher,
-				ItemID.VenusMagnum,
-				ItemID.NettleBurst,
-				ItemID.LeafBlower,
-				ItemID.FlowerPow,
-				ItemID.WaspGun,
-				ItemID.Seedler,
-			]
-		];
-	}
+					if (group.Count > 1) {
+						result.Add(group);
+					}
+				}
 
-	public class GolemDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.Stynger,
-				ItemID.PossessedHatchet,
-				ItemID.SunStone,
-				ItemID.EyeoftheGolem,
-				ItemID.HeatRay,
-				ItemID.StaffofEarth,
-				ItemID.GolemFist,
-			]
-		];
-	}
+				// Handle Calamity's special snowflake drop rule
+				if (rule.GetType().Name == "AllOptionsAtOnceWithPityDropRule") {
+					var stacksField = rule.GetType().GetField("stacks");
+					if (stacksField != null) {
+						var stacks = stacksField.GetValue(rule) as Array;
+						if (stacks != null && stacks.Length > 1) {
+							List<int> group = new();
+							foreach (var stack in stacks) {
+								var itemIDField = stack.GetType().GetField("itemID",
+									BindingFlags.Instance |
+									BindingFlags.NonPublic);
+								if (itemIDField != null) {
+									int itemID = (int)itemIDField.GetValue(stack);
+									group.Add(itemID);
+								} else {
+								}
+							}
 
-	public class DukeFishronDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.BubbleGun,
-				ItemID.Flairon,
-				ItemID.RazorbladeTyphoon,
-				ItemID.TempestStaff,
-				ItemID.Tsunami,
-			]
-		];
-	}
+							if (group.Count > 1) {
+								result.Add(group);
+							}
+						} else {
+						}
+					} else {
+					}
+				}
 
-	public class EmpressOfLightDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.FairyQueenMagicItem,
-				ItemID.PiercingStarlight,
-				ItemID.RainbowWhip,
-				ItemID.FairyQueenRangedItem,
-			]
-		];
-	}
+				if (rule.ChainedRules != null) {
+					foreach (var chainRule in rule.ChainedRules) {
+						var subRules = new List<IItemDropRule> { chainRule.RuleToChain };
+						var subGroups = ExtractOneFromOptionsGroups(subRules);
+						result.AddRange(subGroups);
+					}
+				}
+			}
 
-	public class MoonLordDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.Meowmere,
-				ItemID.Terrarian,
-				ItemID.StarWrath,
-				ItemID.SDMG,
-				ItemID.Celeb2,
-				ItemID.LastPrism,
-				ItemID.LunarFlareBook,
-				ItemID.RainbowCrystalStaff,
-				ItemID.MoonlordTurretStaff,
-			]
-		];
-	}
-
-	public class DarkMageDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.SquireShield,
-				ItemID.ApprenticeScarf,
-			],
-			[
-				ItemID.DD2PetDragon,
-				ItemID.DD2PetGato,
-			]
-		];
-	}
-
-	public class OgreDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.HuntressBuckler,
-				ItemID.MonkBelt,
-			],
-			[
-				ItemID.BookStaff,
-				ItemID.DD2PhoenixBow,
-				ItemID.DD2SquireDemonSword,
-				ItemID.MonkStaffT1,
-				ItemID.MonkStaffT2,
-			]
-		];
-	}
-
-	public class BetsyDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.DD2BetsyBow,
-				ItemID.MonkStaffT3,
-				ItemID.ApprenticeStaffT3,
-				ItemID.DD2SquireBetsySword,
-			]
-		];
-	}
-
-	public class MourningWoodDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.SpookyHook,
-				ItemID.SpookyTwig,
-				ItemID.StakeLauncher,
-				ItemID.CursedSapling,
-				ItemID.NecromanticScroll,
-			]
-		];
-	}
-
-	public class PumpkingDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.CandyCornRifle,
-				ItemID.JackOLanternLauncher,
-				ItemID.BlackFairyDust,
-				ItemID.TheHorsemansBlade,
-				ItemID.BatScepter,
-				ItemID.RavenStaff,
-				ItemID.ScytheWhip,
-				ItemID.SpiderEgg,
-			]
-		];
-	}
-
-	public class EverscreamDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.ChristmasTreeSword,
-				ItemID.ChristmasHook,
-				ItemID.Razorpine,
-				ItemID.FestiveWings,
-			]
-		];
-	}
-
-	public class SantankDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.ElfMelter,
-				ItemID.ChainGun,
-			]
-		];
-	}
-
-	public class IceQueenDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.BlizzardStaff,
-				ItemID.SnowmanCannon,
-				ItemID.NorthPole,
-				ItemID.BabyGrinchMischiefWhistle,
-			]
-		];
-	}
-
-	public class MartianSaucerDrops : DropChild {
-		protected override int[][] DropTables => [
-			[
-				ItemID.Xenopopper,
-				ItemID.XenoStaff,
-				ItemID.LaserMachinegun,
-				ItemID.ElectrosphereLauncher,
-				ItemID.InfluxWaver,
-				ItemID.CosmicCarKey,
-			]
-		];
+			return result;
+		}
 	}
 }

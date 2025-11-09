@@ -33,7 +33,16 @@ namespace SaneRNG
 				case PityDropsPacketType.VoucherUpdate:
 					HandleVoucherUpdate(reader);
 					break;
+				case PityDropsPacketType.RequestItem:
+					HandleRequestItem(reader);
+					break;
 			}
+		}
+
+		private void HandleRequestItem(System.IO.BinaryReader reader) {
+			int itemType = reader.ReadInt32();
+
+			SaneRNGTravelingMerchant.PushRequest(itemType);
 		}
 
 		private void HandleVoucherUpdate(System.IO.BinaryReader reader) {

@@ -85,14 +85,16 @@ namespace SaneRNG.Common.Items {
 		};
 	}
 
-	public class ShimmerRegistry : GlobalItem {
-		public override void SetStaticDefaults() {
+	public class ShimmerRegistry : ModSystem {
+		public override void PostSetupContent() {
+		}
+
+		public override void PostSetupRecipes() {
 			ItemShimmers itemShimmers = new();
 			AccessoryShimmers accessoryShimmers = new();
-			BossDropTree bossDropShimmers = new();
 
 			if (ModContent.GetInstance<SaneRNGServerConfig>().EnableBossDropShimmer) {
-				bossDropShimmers.Traverse();
+				BossDropShimmers.RegisterBossShimmers();
 			}
 			itemShimmers.RegisterAll();
 			accessoryShimmers.RegisterAll();
