@@ -74,7 +74,7 @@ Currencies: {
 
 Configs: {
 	SaneRNGServerConfig: {
-		DisplayName: Sane R N G Server Config
+		DisplayName: Sane RNG Server Config
 
 		EnablePityDrops: {
 			Label: Enable Pity Drops
@@ -93,7 +93,7 @@ Configs: {
 
 		EnableAnglerShops: {
 			Label: Enable Angler Shops
-			Tooltip: Enable the angler shop system, and replace quest rewards with Angler Medals.
+			Tooltip: Enable the angler shop system, and add Angler Medals to the Angler's quest rewards.
 		}
 
 		EnableTravelingMerchantRequests: {
